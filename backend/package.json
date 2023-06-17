@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "@powershell Remove-Item -Recurse build/ && cd ../frontend && npm run build && @powershell Copy-Item -Recurse build/ ../backend/",
+    "deploy": "npm run build:ui && fly deploy",
+    "logs:prod": "fly logs"
   },
   "repository": {
     "type": "git",
