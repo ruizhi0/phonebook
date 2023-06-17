@@ -86,6 +86,29 @@ app.post("/api/persons", (req, res) => {
   });
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+  if (!body.name) {
+    res.status(400).json({ error: "name is required" });
+    return;
+  }
+  if (!body.number) {
+    res.status(400).json({ error: "number is required" });
+    return;
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((error) => next(error));
+});
+
 const errorHandler = (error, req, res, next) => {
   console.log(error.message);
 
