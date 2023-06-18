@@ -50,12 +50,9 @@ const CreateContactForm = ({ contacts, setContacts }) => {
           contacts.map((c) => (c.id !== updatedContact.id ? c : updatedContact))
         )
       )
-      .catch((error) => {
+      .catch((err) => {
         setContacts(contacts.filter((c) => c.id !== contactToUpdate.id));
-        setTemporaryNotificationMessage(
-          `Information of ${contactToUpdate.name} has already been removed from server`,
-          false
-        );
+        setTemporaryNotificationMessage(err.response.data.error, false);
       });
   };
 
@@ -66,9 +63,14 @@ const CreateContactForm = ({ contacts, setContacts }) => {
       number: newContactNumber,
     };
 
-    contactService.create(newContact).then((createdContact) => {
-      setContacts(contacts.concat(createdContact));
-    });
+    contactService
+      .create(newContact)
+      .then((createdContact) => {
+        setContacts(contacts.concat(createdContact));
+      })
+      .catch((err) => {
+        setTemporaryNotificationMessage(err.response.data.error, false);
+      });
 
     return newContact;
   };
