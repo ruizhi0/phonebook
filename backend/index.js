@@ -56,16 +56,9 @@ app.delete("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
-  if (!body.name) {
-    res.status(400).json({ error: "name is required" });
-    return;
-  }
-  if (!body.number) {
-    res.status(400).json({ error: "number is required" });
-    return;
-  }
+
   Person.find({ name: body.name }).then((persons) => {
     if (persons.length !== 0) {
       res.status(400).json({ error: "name must be unique" });
@@ -88,21 +81,17 @@ app.post("/api/persons", (req, res) => {
 
 app.put("/api/persons/:id", (req, res, next) => {
   const body = req.body;
-  if (!body.name) {
-    res.status(400).json({ error: "name is required" });
-    return;
-  }
-  if (!body.number) {
-    res.status(400).json({ error: "number is required" });
-    return;
-  }
 
   const person = {
     name: body.name,
     number: body.number,
   };
 
-  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+  Person.findOneAndUpdate({ _id: req.params.id }, person, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
     .then((updatedPerson) => {
       res.json(updatedPerson);
     })
@@ -114,6 +103,8 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError") {
     res.status(400).send({ error: "malformed id" });
+  } else if (error.name === "ValidationError") {
+    res.status(400).json({ error: error.message });
   } else {
     res.status(500).end();
   }
