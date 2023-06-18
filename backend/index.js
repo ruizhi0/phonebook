@@ -7,7 +7,7 @@ const Person = require("./models/person");
 
 const app = express();
 
-morgan.token("body", (req, res) => {
+morgan.token("body", (req) => {
   return JSON.stringify(req.body);
 });
 
