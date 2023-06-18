@@ -20,6 +20,12 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
+    minLength: 8,
+    validate: {
+      validator: (v) => /^\d{2,3}-\d+$/.test(v),
+      message: (props) =>
+        `${props.value} does not match format '{2 or 3 digits}-{1 or more digits}'`,
+    },
     required: true,
   },
 });
